@@ -1,6 +1,7 @@
 package com.hieu.order;
 
 import com.hieu.customer.CustomerClient;
+import com.hieu.customer.CustomerResponse;
 import com.hieu.exception.BusinessException;
 import com.hieu.kafka.OrderConfirmation;
 import com.hieu.kafka.OrderProducer;
@@ -8,11 +9,15 @@ import com.hieu.orderline.OrderLineRequest;
 import com.hieu.orderline.OrderLineService;
 import com.hieu.product.ProductClient;
 import com.hieu.product.PurchaseRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -68,4 +73,25 @@ public class OrderService {
     }
 
 
+    public List<OrderResponse> findAll() {
+        List<Order> orders = repository.findAll();
+
+        return orders.stream()
+                .map(
+                        mapper::toOrderResponse
+                )
+                .collect(Collectors.toList());
+    }
+
+    public OrderResponse findById(Integer id) {
+        return repository.findById(id).map(mapper::toOrderResponse)
+                .orElseThrow(
+                        () ->  new EntityNotFoundException(
+                                String.format("No order found with the provided ID: %d", id))
+                );
+    }
+//
+//    public void delete(String id) {
+//        repository.delete(id);
+//    }
 }
