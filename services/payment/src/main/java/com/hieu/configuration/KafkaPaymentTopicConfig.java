@@ -1,4 +1,4 @@
-package com.hieu.config;
+package com.hieu.configuration;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
@@ -6,11 +6,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
-public class KafkaOrderTopicConfig {
+public class KafkaPaymentTopicConfig {
     @Bean
-    public NewTopic orderTopic() {
+    public NewTopic paymentTopic() {
         return TopicBuilder
-                .name("order-topic")
+                .name("payment-topic")
                 .build();
     }
+
 }
