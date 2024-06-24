@@ -1,4 +1,4 @@
-package com.hieu.product;
+package com.hieu.payment;
 
 
 import com.hieu.customer.CustomerResponse;

@@ -7,6 +7,7 @@ import com.hieu.kafka.OrderConfirmation;
 import com.hieu.kafka.OrderProducer;
 import com.hieu.orderline.OrderLineRequest;
 import com.hieu.orderline.OrderLineService;
+import com.hieu.payment.PaymentRequest;
 import com.hieu.product.ProductClient;
 import com.hieu.product.PurchaseRequest;
 import jakarta.persistence.EntityNotFoundException;
@@ -39,10 +40,13 @@ public class OrderService {
                         () -> new BusinessException("Cannot create order:: No Customer exist")
                 );
         var purchaseProducts = productClient.purchaseProducts(request.products());
+
         //purchase the products -> product-ms RestTemplate
         this.productClient.purchaseProducts(request.products());
+
         //persist order
         var order = this.repository.save(mapper.toOrder(request));
+
         //persist order lines
         for (
                 PurchaseRequest purchaseRequest : request.products()
@@ -57,7 +61,15 @@ public class OrderService {
             );
 
         }
-        // todo start payment process
+
+        //  start payment process
+        var paymentRequest = new PaymentRequest(
+                request.amount(),
+                request.paymentMethod(),
+                order.getId(),
+                order.getReference(),
+                customer
+        );
 
         //send the order confirmation -> notification-ms (kafka)
         orderProducer.sendOrderConfirmationMessage(
